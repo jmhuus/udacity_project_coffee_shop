@@ -53,7 +53,7 @@ def get_drinks():
 '''
 @app.route("/drinks-detail", methods=["GET"])
 @requires_auth(permission="get:drinks-detail")
-def get_drinks_detail(payload):
+def get_drinks_detail():
     print()
     print()
     print("route GET /drinks-detail")
@@ -76,7 +76,7 @@ def get_drinks_detail(payload):
 '''
 @app.route("/drinks", methods=["POST"])
 @requires_auth(permission="post:drinks")
-def create_new_drink(payload):
+def create_new_drink():
     print()
     print()
     print("running POST /drinks")
