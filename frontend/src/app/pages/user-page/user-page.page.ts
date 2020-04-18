@@ -11,6 +11,8 @@ export class UserPagePage implements OnInit {
 
   constructor(public auth: AuthService) {
     this.loginURL = auth.build_login_link('/tabs/user-page');
+    console.log(this.loginURL);
+
   }
 
   ngOnInit() {
