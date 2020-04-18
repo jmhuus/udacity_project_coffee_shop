@@ -75,7 +75,8 @@ def get_drinks_detail(payload):
         or appropriate status code indicating reason for failure
 '''
 @app.route("/drinks", methods=["POST"])
-def create_new_drink():
+@requires_auth(permission="post:drinks")
+def create_new_drink(payload):
     print()
     print()
     print("running POST /drinks")
@@ -116,6 +117,7 @@ def create_new_drink():
         or appropriate status code indicating reason for failure
 '''
 @app.route("/drinks/<int:id>", methods=["PATCH"])
+@requires_auth(permission="patch:drinks")
 def update_drink(id):
     print()
     print()
@@ -158,6 +160,7 @@ def update_drink(id):
         or appropriate status code indicating reason for failure
 '''
 @app.route("/drinks/<int:id>", methods=["DELETE"])
+@requires_auth(permission="delete:drinks")
 def delete_drink(id):
     print()
     print()
