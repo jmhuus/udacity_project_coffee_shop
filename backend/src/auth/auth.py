@@ -31,8 +31,20 @@ class AuthError(Exception):
     [COMPLETE] return the token part of the header
 '''
 def get_token_auth_header():
-    print("running get_token_auth_header..")
-    """Obtains the Access Token from the Authorization Header
+    """
+    Obtains the access token from the request's header.
+    request > header > authorization > bearer & token
+
+    Args:
+        NONE: No parameters are required but this function relies on access
+        to Flask's request object.
+
+    Returns:
+        JWT token string.
+
+    Raises:
+        KeyError: Raises an AuthError if the authorization header malformed or
+        is missing.
     """
     auth = request.headers.get('Authorization', None)
     if not auth:
@@ -70,14 +82,26 @@ def get_token_auth_header():
         permission: string permission (i.e. 'post:drink')
         payload: decoded jwt payload
 
-    it should raise an AuthError if permissions are not included in the payload
-        !!NOTE check your RBAC settings in Auth0
-    it should raise an AuthError if the requested permission string is not in the payload permissions array
-    return true otherwise
+    [COMPLETE] it should raise an AuthError if permissions are not included in the payload
+        [COMPLETE] !!NOTE check your RBAC settings in Auth0
+    [COMPLETE] it should raise an AuthError if the requested permission string is not in the payload permissions array
+    [COMPLETE] return true otherwise
 '''
 def check_permissions(permission, payload):
-    print("running check_permissions")
+    """
+    Checks if the requesting user is authorized to perform the action stated
+    in the permission paramter.
 
+    Args:
+        permission: String value of the requesting permission; 'get:drinks'.
+        payload: Dictionary of authorization data.
+
+    Returns:
+        True if the requesting permission is authorized.
+
+    Raises:
+        KeyError: Raises an AuthError.
+    """
     if "permissions" not in payload:
         raise AuthError({
             'code': 'permissions_unavailable',
@@ -91,6 +115,7 @@ def check_permissions(permission, payload):
         }, 401)
 
     return True
+
 
 '''
 @TODO implement verify_decode_jwt(token) method
@@ -106,7 +131,20 @@ def check_permissions(permission, payload):
     !!NOTE urlopen has a common certificate error described here: https://stackoverflow.com/questions/50236117/scraping-ssl-certificate-verify-failed-error-for-http-en-wikipedia-org
 '''
 def verify_decode_jwt(token):
-    print("running verify_decode_jwt")
+    """
+    Validates the user's JWT token and returns the contained payload. This
+    function uses a public key (rsa_key) to verify the token's validity, which
+    is retrieved from appending '/.well-known/jwks.json' to the domain.
+
+    Args:
+        token: String containing the JWT token.
+
+    Returns:
+        Payload contained in the JWT token IF the token is valid.
+
+    Raises:
+        KeyError: Raises an AuthError if the token is not valid.
+    """
 
     # Retrieve token header
     unverified_header = jwt.get_unverified_header(token)

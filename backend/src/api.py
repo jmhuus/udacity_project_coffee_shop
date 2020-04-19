@@ -7,7 +7,6 @@ from flask_cors import CORS
 from .database.models import db_drop_and_create_all, setup_db, Drink
 from .auth.auth import AuthError, requires_auth
 
-import pdb
 
 app = Flask(__name__)
 setup_db(app)
@@ -31,11 +30,8 @@ CORS(app)
 '''
 @app.route("/drinks", methods=["GET"])
 def get_drinks():
-    print()
-    print()
-    print("route GET /drinks")
-
-
+    """Returns a list of short drink details to any user.
+    """
     drinks = [drink.short() for drink in Drink.query.all()]
     return jsonify({
         "success": True,
@@ -54,10 +50,8 @@ def get_drinks():
 @app.route("/drinks-detail", methods=["GET"])
 @requires_auth(permission="get:drinks-detail")
 def get_drinks_detail():
-    print()
-    print()
-    print("route GET /drinks-detail")
-
+    """Returns a list of long drink details to authorized users.
+    """
     drinks = [drink.long() for drink in Drink.query.all()]
     return jsonify({
         "success": True,
@@ -77,12 +71,8 @@ def get_drinks_detail():
 @app.route("/drinks", methods=["POST"])
 @requires_auth(permission="post:drinks")
 def create_new_drink():
-    print()
-    print()
-    print("running POST /drinks")
-
-    # TODO(jordanhuus): require the 'post:drinks' permission
-
+    """Adds a new drink for authorized users.
+    """
     try:
         # Read request data
         data = json.loads(request.data)
@@ -119,12 +109,8 @@ def create_new_drink():
 @app.route("/drinks/<int:id>", methods=["PATCH"])
 @requires_auth(permission="patch:drinks")
 def update_drink(id):
-    print()
-    print()
-    print("route PATCH /drinks/<int:id>")
-
-    # TODO(jordanhuus): require the 'patch:drinks' permission
-
+    """Updates an existing drink's details for authorized users.
+    """
     try:
         # Read request data
         data = json.loads(request.data)
@@ -162,12 +148,8 @@ def update_drink(id):
 @app.route("/drinks/<int:id>", methods=["DELETE"])
 @requires_auth(permission="delete:drinks")
 def delete_drink(id):
-    print()
-    print()
-    print("route DELETE /drinks/<int:id>")
-
-    # TODO(jordanhuus): require the 'delete:drinks' permission
-
+    """Removes an existing drink for authorized users.
+    """
     try:
         # Init new Drink obj
         drink = Drink.query.get(id)
@@ -199,6 +181,7 @@ def unprocessable(error):
                     "message": "unprocessable"
                     }, 422)
 
+
 '''
 @TODO implement error handlers using the @app.errorhandler(error) decorator
     each error handler should return (with approprate messages):
@@ -209,14 +192,12 @@ def unprocessable(error):
                     }), 404
 
 '''
-
 '''
 @TODO implement error handler for 404
     error handler should conform to general task above
 '''
 @app.errorhandler(404)
 def not_found(error):
-    print("running not_found")
     return jsonify({
                     "success": False,
                     "error": 404,
@@ -225,8 +206,7 @@ def not_found(error):
 
 
 @app.errorhandler(400)
-def not_found(error):
-    print("running not_found")
+def bad_request(error):
     return jsonify({
                     "success": False,
                     "error": 400,
@@ -236,7 +216,6 @@ def not_found(error):
 
 @app.errorhandler(401)
 def unauthorized(error):
-    print("running unauthorized")
     return jsonify({
                     "success": False,
                     "error": 401,
@@ -246,7 +225,6 @@ def unauthorized(error):
 
 @app.errorhandler(422)
 def unprocessable(error):
-    print("running unprocessable")
     return jsonify({
                     "success": False,
                     "error": 422,
@@ -256,7 +234,6 @@ def unprocessable(error):
 
 @app.errorhandler(500)
 def not_found(error):
-    print("running not_found")
     return jsonify({
                     "success": False,
                     "error": 500,
@@ -270,28 +247,8 @@ def not_found(error):
 '''
 @app.errorhandler(AuthError)
 def not_authorized(error):
-    print("running not_authorized")
-    response = jsonify(error.to_dict())
-    response.status_code = error.status_code
-    return response
-
-
-
-
-# Personal test route for inserting new rows manually
-# TODO(jordanhuus): remove before pushing to prod
-@app.route("/test", methods=["GET"])
-def test_route():
-
-    new_drink = Drink()
-    new_drink.title = "test drink"
-    new_drink.recipe = json.dumps([
-        {
-            "color": "light",
-            "name": "light for the night",
-            "parts": 9
-        }
-    ])
-    new_drink.insert()
-
-    return "None"
+    return jsonify({
+                    "success": False,
+                    "error": error.status_code,
+                    "message": error.error
+                    }, error.status_code)
