@@ -24,7 +24,6 @@ CORS(app)
 def get_drinks():
     """Returns a list of short drink details to any user.
     """
-    
     drinks = [drink.short() for drink in Drink.query.all()]
     return jsonify({
         "success": True,
@@ -91,10 +90,12 @@ def update_drink(id):
         drink.recipe = new_recipe
         drink.update()
 
-    except Exception as e: # Catch all
+    # Catch all
+    except Exception as e:
         abort(400)
 
-    except AttributeError as ae: # Drink ID not found
+    # Drink ID not found
+    except AttributeError as ae:
         abort(404)
 
     return jsonify({
@@ -114,10 +115,12 @@ def delete_drink(id):
         drink = Drink.query.get(id)
         drink.delete()
 
-    except Exception as e: # Catch all
+    # Catch all
+    except Exception as e:
         abort(400)
 
-    except AttributeError as ae: # Drink ID not found
+    # Drink ID not found
+    except AttributeError as ae:
         abort(404)
 
     drinks = [drink.long() for drink in Drink.query.all()]
@@ -127,66 +130,62 @@ def delete_drink(id):
     })
 
 
-## Error Handling
+# Error Handling
 @app.errorhandler(422)
-def unprocessable(error):
-    print("running unprocessable")
+def unprocessable_error(error):
+    print("running unprocessable_error")
     return jsonify({
                     "success": False,
                     "error": 422,
                     "message": "unprocessable"
-                    }, 422)
+                    }), 422
 
 
 @app.errorhandler(404)
-def not_found(error):
+def page_not_found_error(error):
+    print("running not_found_error")
     return jsonify({
                     "success": False,
                     "error": 404,
                     "message": "not found"
-                    }, 404)
+                    }), 404
 
 
 @app.errorhandler(400)
-def bad_request(error):
+def bad_request_error(error):
+    print("running bad_request_error")
     return jsonify({
                     "success": False,
                     "error": 400,
                     "message": "bad request"
-                    }, 400)
+                    }), 400
 
 
 @app.errorhandler(401)
-def unauthorized(error):
+def unauthorized_error(error):
+    print("running unauthorized")
     return jsonify({
                     "success": False,
                     "error": 401,
                     "message": "unauthorized"
-                    }, 401)
-
-
-@app.errorhandler(422)
-def unprocessable(error):
-    return jsonify({
-                    "success": False,
-                    "error": 422,
-                    "message": "unprocessable"
-                    }, 422)
+                    }), 401
 
 
 @app.errorhandler(500)
-def not_found(error):
+def internal_server_error(error):
+    print("running internal_server_error")
     return jsonify({
                     "success": False,
                     "error": 500,
                     "message": "server error"
-                    }, 500)
+                    }), 500
 
 
 @app.errorhandler(AuthError)
-def not_authorized(error):
+def not_authorized_error(error):
+    print("running not_authorized_error")
     return jsonify({
                     "success": False,
                     "error": error.status_code,
                     "message": error.error
-                    }, error.status_code)
+                    }), error.status_code
